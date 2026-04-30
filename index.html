@@ -1374,95 +1374,155 @@
   cursor: pointer;
   color: white;
 }
+<!-- RYZ3N CHATBOT -->
+<style>
+#chatbot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 340px;
+  height: 460px;
+  background: #0F0F15;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+  color: white;
+  z-index: 9999;
+}
+#chat-header {
+  padding: 12px;
+  background: #000;
+  text-align: center;
+}
+#chat-body {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+.message { margin: 6px 0; }
+.bot { color: #E94560; }
+.user { text-align: right; }
+#chat-input {
+  display: flex;
+}
+#chat-input input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #0F0F15;
+  color: white;
+}
+#chat-input button {
+  background: #E94560;
+  border: none;
+  padding: 10px;
+  color: white;
+}
 </style>
 
 <div id="chatbot">
-  <div id="chat-header">Ryz3n Assistant</div>
+  <div id="chat-header">Assistant</div>
   <div id="chat-body"></div>
   <div id="chat-input">
-    <input type="text" id="input" placeholder="Votre réponse..." />
+    <input id="input" placeholder="..." />
     <button onclick="sendMessage()">OK</button>
   </div>
 </div>
 
 <script>
-const chatBody = document.getElementById("chat-body");
-const input = document.getElementById("input");
+// 🔑 REPLACE WITH YOUR VALUES
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_KEY = "YOUR_ANON_KEY";
 
-let step = 0;
+// Detect language from your system
+let lang = document.documentElement.lang || "en";
 
-let data = {
-  business_type: "",
-  offer_type: "",
-  has_leads: "",
-  pain_point: "",
-  urgency: "",
-  name: "",
-  phone: ""
+// Translations
+const texts = {
+  nl: [
+    "Welkom 👋 Wat voor business heb je?",
+    "Wat wil je bouwen? (site / automatisatie / systeem)",
+    "Krijg je al klanten? (ja/nee)",
+    "Wat is je grootste probleem?",
+    "Wil je snel starten? (ja/nee)",
+    "Je naam?",
+    "Je telefoonnummer?"
+  ],
+  fr: [
+    "Bienvenue 👋 Quel type de business as-tu ?",
+    "Que veux-tu mettre en place ? (site / automatisation / système)",
+    "Reçois-tu déjà des clients ? (oui/non)",
+    "Quel est ton plus gros problème ?",
+    "Tu veux commencer rapidement ? (oui/non)",
+    "Ton nom ?",
+    "Ton numéro ?"
+  ],
+  en: [
+    "Welcome 👋 What business do you have?",
+    "What do you want to build? (website / automation / system)",
+    "Do you already get clients? (yes/no)",
+    "What is your biggest problem?",
+    "Do you want to start fast? (yes/no)",
+    "Your name?",
+    "Your phone number?"
+  ]
 };
 
-const questions = [
-  "Salut 👋 Quel type de business as-tu ?",
-  "Qu’est-ce que tu veux mettre en place ? (site / automatisation / système)",
-  "Tu reçois déjà des demandes clients ? (oui/non)",
-  "Quel est ton plus gros problème actuellement ?",
-  "Tu veux que ça soit prêt rapidement ? (oui/non)",
-  "Ton nom ?",
-  "Ton numéro de téléphone ?"
-];
+let step = 0;
+let data = {};
+
+const chatBody = document.getElementById("chat-body");
 
 function addMessage(text, sender) {
   const div = document.createElement("div");
-  div.classList.add("message", sender);
+  div.className = "message " + sender;
   div.innerText = text;
   chatBody.appendChild(div);
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 
 function sendMessage() {
+  const input = document.getElementById("input");
   const value = input.value.trim();
   if (!value) return;
 
   addMessage(value, "user");
   input.value = "";
 
-  switch(step) {
-    case 0: data.business_type = value; break;
-    case 1: data.offer_type = value; break;
-    case 2: data.has_leads = value; break;
-    case 3: data.pain_point = value; break;
-    case 4: data.urgency = value; break;
-    case 5: data.name = value; break;
-    case 6: data.phone = value; break;
-  }
+  const keys = ["business_type","offer_type","has_leads","pain_point","urgency","name","phone"];
+  data[keys[step]] = value;
 
   step++;
 
-  if (step < questions.length) {
-    setTimeout(() => addMessage(questions[step], "bot"), 400);
+  if (step < texts[lang].length) {
+    setTimeout(() => addMessage(texts[lang][step], "bot"), 400);
   } else {
-    addMessage("Merci 🙌 On te recontacte rapidement.", "bot");
-
-    console.log("RYZ3N LEAD:", data);
-
-    sendToBackend(data);
+    addMessage("✔️ Done", "bot");
+    sendToSupabase();
   }
 }
 
-function sendToBackend(data) {
-  fetch("https://your-api-endpoint.com/leads", {
+function sendToSupabase() {
+  fetch(`${SUPABASE_URL}/rest/v1/leads`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + SUPABASE_KEY
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify({
+      ...data,
+      language: lang,
+      source: "ryz3n"
+    })
   })
-  .then(res => console.log("Sent"))
+  .then(() => console.log("Saved to Supabase"))
   .catch(err => console.error(err));
 }
 
-// Start
-addMessage(questions[0], "bot");
+// start
+addMessage(texts[lang][0], "bot");
 </script>
 </body>
 </html>
