@@ -1308,7 +1308,161 @@
             });
         });
     })();
-</script>
+</script>    
+<style>
+#chatbot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 340px;
+  height: 440px;
+  background: #0F0F15;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  color: white;
+  overflow: hidden;
+  z-index: 999;
+}
 
+#chat-header {
+  background: #0A0A0F;
+  padding: 12px;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+#chat-body {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+.message {
+  margin: 6px 0;
+}
+
+.bot {
+  color: #E94560;
+}
+
+.user {
+  text-align: right;
+}
+
+#chat-input {
+  display: flex;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+#chat-input input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #0F0F15;
+  color: white;
+}
+
+#chat-input button {
+  background: #E94560;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  color: white;
+}
+</style>
+
+<div id="chatbot">
+  <div id="chat-header">Ryz3n Assistant</div>
+  <div id="chat-body"></div>
+  <div id="chat-input">
+    <input type="text" id="input" placeholder="Votre réponse..." />
+    <button onclick="sendMessage()">OK</button>
+  </div>
+</div>
+
+<script>
+const chatBody = document.getElementById("chat-body");
+const input = document.getElementById("input");
+
+let step = 0;
+
+let data = {
+  business_type: "",
+  offer_type: "",
+  has_leads: "",
+  pain_point: "",
+  urgency: "",
+  name: "",
+  phone: ""
+};
+
+const questions = [
+  "Salut 👋 Quel type de business as-tu ?",
+  "Qu’est-ce que tu veux mettre en place ? (site / automatisation / système)",
+  "Tu reçois déjà des demandes clients ? (oui/non)",
+  "Quel est ton plus gros problème actuellement ?",
+  "Tu veux que ça soit prêt rapidement ? (oui/non)",
+  "Ton nom ?",
+  "Ton numéro de téléphone ?"
+];
+
+function addMessage(text, sender) {
+  const div = document.createElement("div");
+  div.classList.add("message", sender);
+  div.innerText = text;
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function sendMessage() {
+  const value = input.value.trim();
+  if (!value) return;
+
+  addMessage(value, "user");
+  input.value = "";
+
+  switch(step) {
+    case 0: data.business_type = value; break;
+    case 1: data.offer_type = value; break;
+    case 2: data.has_leads = value; break;
+    case 3: data.pain_point = value; break;
+    case 4: data.urgency = value; break;
+    case 5: data.name = value; break;
+    case 6: data.phone = value; break;
+  }
+
+  step++;
+
+  if (step < questions.length) {
+    setTimeout(() => addMessage(questions[step], "bot"), 400);
+  } else {
+    addMessage("Merci 🙌 On te recontacte rapidement.", "bot");
+
+    console.log("RYZ3N LEAD:", data);
+
+    sendToBackend(data);
+  }
+}
+
+function sendToBackend(data) {
+  fetch("https://your-api-endpoint.com/leads", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+  .then(res => console.log("Sent"))
+  .catch(err => console.error(err));
+}
+
+// Start
+addMessage(questions[0], "bot");
+</script>
 </body>
 </html>
