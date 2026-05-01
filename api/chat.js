@@ -175,6 +175,10 @@ export function handleChat(message, addMessage, sendLead) {
 // ================================
 window.addButtons(...)
 window.enableInput(...)
+export function handleChat(message, addMessage, sendLead, ui) {
+  ui.addButtons(...)
+  ui.enableInput()
+}
 function nextStep(addMessage, sendLead) {
 
   const t = translations[lang];
