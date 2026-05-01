@@ -46,7 +46,7 @@ const priority =
     await resend.emails.send({
       from: "Ryz3n <onboarding@resend.dev>",
       to: ["ryzenoutsourcing@gmail.com"],
-      subject: `🔥 ${priority} Lead (€${lead.estimated_value})`
+      subject: `🔥 ${priority} Lead (€${lead.estimated_value})`,
       html: `
 <h2>⚡ New Lead - Ryz3n</h2>
 
