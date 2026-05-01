@@ -1,14 +1,87 @@
-export default async function handler(req, res) {
-  const { message } = req.body;
-const msg = message.toLowerCase();
+let step = 0;
 
-  let reply;
-if (["taxi","uber","fleet","dispatch"].some(k => msg.includes(k))) {
-  reply = "Taxi businesses lose up to 30% revenue due to bad dispatch systems.";
-} else if (message.includes("ecommerce")) {
-  reply = "E-commerce stores lose revenue from poor automation and abandoned carts.";
-} else {
-  reply = "We detect inefficiencies in most systems. We can fix this in 14 days.";
-}
-  res.status(200).json({ reply });
+const lead = {
+  business_type: "",
+  revenue: "",
+  bottleneck: "",
+  urgency: "",
+  name: "",
+  email: "",
+  phone: "",
+  score: 0,
+  estimated_value: 0,
+  source: "chatbot"
+};
+
+const questions = [
+  "What business do you run?",
+  "What’s your monthly revenue? (low / medium / high)",
+  "What’s your biggest bottleneck right now?",
+  "Is this urgent? (yes / no)",
+  "Your name?",
+  "Your email?",
+  "Your phone number?"
+];
+
+export function handleChat(message, sendReply, sendLead) {
+  const msg = message.trim();
+
+  // STEP LOGIC
+  if (step === 0) {
+    sendReply("Let’s see how much revenue you're losing.");
+    sendReply(questions[0]);
+    step++;
+    return;
+  }
+
+  if (step === 1) {
+    lead.business_type = msg;
+  }
+
+  if (step === 2) {
+    lead.revenue = msg.toLowerCase();
+  }
+
+  if (step === 3) {
+    lead.bottleneck = msg;
+  }
+
+  if (step === 4) {
+    lead.urgency = msg.toLowerCase();
+  }
+
+  if (step === 5) {
+    lead.name = msg;
+  }
+
+  if (step === 6) {
+    lead.email = msg;
+  }
+
+  if (step === 7) {
+    lead.phone = msg;
+
+    // 🔥 SCORING
+    let score = 0;
+
+    if (lead.revenue === "high") score += 50;
+    if (lead.revenue === "medium") score += 30;
+
+    if (lead.urgency === "yes") score += 30;
+
+    lead.score = score;
+    lead.estimated_value = score * 100;
+
+    // 🚀 SEND TO BACKEND
+    sendLead(lead);
+
+    sendReply("🔥 You're losing serious revenue.");
+    sendReply("We’ll contact you within 24h.");
+
+    step = 0;
+    return;
+  }
+
+  sendReply(questions[step]);
+  step++;
 }
