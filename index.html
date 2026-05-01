@@ -1190,6 +1190,13 @@
         // ==========================================
         // DROPDOWN MENU (Language)
         // ==========================================
+        document.querySelectorAll('[data-lang]').forEach(el => {
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    const lang = el.getAttribute('data-lang');
+    setLang(lang);
+  });
+});
         const dropdown = document.getElementById('languageDropdown');
         dropdown.classList.remove('active');
         if (dropdown) {
@@ -1309,7 +1316,8 @@
         // ==========================================
         // FORM SUBMIT
         // ==========================================
-    const form = document.getElementById("contactForm");
+    
+        const form = document.getElementById("contactForm");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -1374,215 +1382,39 @@ form.addEventListener("submit", async (e) => {
         });
     })();
 </script>    
-<!-- RYZ3N CHATBOT FINAL CLEAN -->
-<style>
-#chatbot {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 340px;
-  height: 460px;
-  background: #0F0F15;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  font-family: 'Inter', sans-serif;
-  color: white;
-  z-index: 9999;
-}
-#chat-header { padding: 12px; background: #000; text-align: center; }
-#chat-body { flex: 1; padding: 10px; overflow-y: auto; }
-.message { margin: 6px 0; }
-.bot { color: #E94560; }
-.user { text-align: right; }
-#chat-input { display: flex; }
-#chat-input input { flex: 1; padding: 10px; background: #0F0F15; color: white; border: none; }
-#chat-input button { background: #E94560; border: none; padding: 10px; color: white; cursor: pointer; }
-</style>
-
-<div id="chatbot">
-  <div id="chat-header">⚡ Ryz3n System Audit</div>
-  <div id="chat-body"></div>
-  <div id="chat-input">
-    <input id="input" placeholder="..." />
-    <button onclick="sendMessage()">OK</button>
-  </div>
-</div>
-<script>
-const SUPABASE_URL = "https://tslbrdumaipemwyzulxk.supabase.co";
-
-    
-let step = 0;
-let data = {};
-let score = 0;
-let lang = "en";
-
-const chatBody = document.getElementById("chat-body");
-const userLang = navigator.language || navigator.userLanguage;
-
-if (userLang.startsWith("fr")) lang = "fr";
-else if (userLang.startsWith("nl")) lang = "nl";
-else lang = "en"; 
-const translations = {
-  en: {
-    welcome: "⚡ Most businesses lose 20–40% revenue due to bad systems. Let’s check yours.",
-    business: "What business do you have?",
-    build: "What do you want to build?",
-    clients: "Do you already get clients?",
-      revenue: "What is your monthly revenue?",
-    problem: "What is your biggest problem?",
-    urgency: "Do you want to start fast?",
-    name: "Your name?",
-    phone: "Your phone number?",
-    qualify: "🚀 You qualify for a priority pilot.",
-    contact: "✅ We'll contact you shortly.",
-      processing: "⚡ Processing...",
-fallback_line1: "You’re leaving money on the table every day.",
-fallback_line2: "We’ll analyze your system and send you a breakdown within 24h.",
-      estimate_low: "€1k–€3k/month",
-estimate_mid: "€3k–€10k/month",
-estimate_high: "€10k+/month",
-estimate_label: "📊 Estimated loss:",
-fix_message: "⚡ We can fix this within 14 days with a custom system.",
-      cta: {
-  book: "📅 Book a call",
-  whatsapp: "💬 WhatsApp"
-},
-      buttons: {
-  business: [
-    { label: "Taxi / Transport", value: "taxi" },
-    { label: "E-commerce", value: "ecommerce" },
-    { label: "Service business", value: "service" },
-    { label: "Other", value: "other" }
-  ],
-  build: [
-    { label: "Website", value: "website" },
-    { label: "Automation", value: "automation" },
-    { label: "Full system", value: "system" }
-  ],
-  yesno: [
-    { label: "Yes", value: "yes" },
-    { label: "No", value: "no" }
-  ],
-  revenue: [
-    { label: "< €5k", value: "low" },
-    { label: "€5k - €20k", value: "mid" },
-    { label: "€20k+", value: "high" }
-  ]
-}
-  },
-
-  fr: {
-    welcome: "⚡ La plupart des entreprises perdent 20 à 40 % de revenus à cause de systèmes inefficaces. Vérifions la vôtre.",
-    business: "Quel est votre type d'activité ?",
-    build: "Que voulez-vous créer ?",
-    clients: "Avez-vous déjà des clients ?",
-      revenue: "Quel est votre chiffre d'affaires mensuel ?",
-    problem: "Quel est votre principal problème ?",
-    urgency: "Voulez-vous démarrer rapidement ?",
-    name: "Votre nom ?",
-    phone: "Votre numéro de téléphone ?",
-    qualify: "🚀 Vous êtes éligible pour un projet prioritaire.",
-    contact: "✅ Nous vous contacterons bientôt.",
-    processing: "⚡ Traitement en cours...",
-fallback_line1: "Vous perdez de l’argent chaque jour.",
-fallback_line2: "Nous analyserons votre système et vous enverrons un diagnostic sous 24h.",
-      estimate_low: "1k€–3k€/mois",
-estimate_mid: "3k€–10k€/mois",
-estimate_high: "10k€+/mois",
-estimate_label: "📊 Perte estimée :",
-fix_message: "⚡ Nous pouvons corriger cela en 14 jours avec un système sur mesure.",
-      cta: {
-  book: "📅 Réserver un appel",
-  whatsapp: "💬 WhatsApp"
-},
-      buttons: {
-  business: [
-    { label: "Taxi / Transport", value: "taxi" },
-    { label: "E-commerce", value: "ecommerce" },
-    { label: "Entreprise de services", value: "service" },
-    { label: "Autre", value: "other" }
-  ],
-  build: [
-    { label: "Site web", value: "website" },
-    { label: "Automatisation", value: "automation" },
-    { label: "Système complet", value: "system" }
-  ],
-  yesno: [
-    { label: "Oui", value: "yes" },
-    { label: "Non", value: "no" }
-  ],
-  revenue: [
-    { label: "< 5k€", value: "low" },
-    { label: "5k€ - 20k€", value: "mid" },
-    { label: "20k€+", value: "high" }
-  ]
-}
-  },
-
-  nl: {
-    welcome: "⚡ De meeste bedrijven verliezen 20–40% omzet door slechte systemen. Laten we die van jou checken.",
-    business: "Wat voor bedrijf heb je?",
-    build: "Wat wil je bouwen?",
-    clients: "Heb je al klanten?",
-      revenue: "Wat is je maandelijkse omzet?",
-    problem: "Wat is je grootste probleem?",
-    urgency: "Wil je snel starten?",
-    name: "Je naam?",
-    phone: "Je telefoonnummer?",
-    qualify: "🚀 Jij komt in aanmerking voor een prioritaire pilot.",
-    contact: "✅ We nemen binnenkort contact op.",
-      processing: "⚡ Bezig met verwerken...",
-fallback_line1: "Je laat elke dag geld liggen.",
-fallback_line2: "We analyseren je systeem en sturen je binnen 24 uur een breakdown.",
-      estimate_low: "€1k–€3k/maand",
-estimate_mid: "€3k–€10k/maand",
-estimate_high: "€10k+/maand",
-estimate_label: "📊 Geschat verlies:",
-fix_message: "⚡ We kunnen dit binnen 14 dagen oplossen met een systeem op maat.",
-      cta: {
-  book: "📅 Plan een call",
-  whatsapp: "💬 WhatsApp"
-},
-      buttons: {
-  business: [
-    { label: "Taxi / Transport", value: "taxi" },
-    { label: "E-commerce", value: "ecommerce" },
-    { label: "Dienstverlening", value: "service" },
-    { label: "Anders", value: "other" }
-  ],
-  build: [
-    { label: "Website", value: "website" },
-    { label: "Automatisering", value: "automation" },
-    { label: "Volledig systeem", value: "system" }
-  ],
-  yesno: [
-    { label: "Ja", value: "yes" },
-    { label: "Nee", value: "no" }
-  ],
-  revenue: [
-    { label: "< €5k", value: "low" },
-    { label: "€5k - €20k", value: "mid" },
-    { label: "€20k+", value: "high" }
-  ]
-}
-  }
-};
-function startChat() {
-  addMessage(translations[lang].welcome, "bot");
-  nextStep();
-}
-     
 <script type="module">
-import { handleChat } from "./chat.js";
+import { handleChat, setLanguage } from "./chat.js";
+
+// 🔥 MAP CHAT DATA → BACKEND STRUCTURE
+function mapLead(data) {
+  const valueMap = {
+    low: 2000,
+    mid: 7000,
+    high: 15000
+  };
+
+  return {
+    business_type: data[0],
+    build_type: data[1],
+    has_clients: data[2],
+    revenue: data[3],
+    problem: data[4],
+    urgency: data[5],
+    name: data[6],
+    phone: data[7],
+    email: data[8],
+    estimated_value: valueMap[data[3]] || 0,
+    score: data.score,
+    lang: data.lang,
+    created_at: data.created_at
+  };
+}
 
 function sendLeadToAPI(lead) {
   return fetch("/api/lead", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(lead)
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(mapLead(lead))
   });
 }
 
@@ -1593,289 +1425,17 @@ window.onUserMessage = function(message) {
     (lead) => sendLeadToAPI(lead)
   );
 };
+
+window.setLang = function(lang) {
+  setLanguage(lang);
+  document.getElementById("chat-body").innerHTML = "";
+  onUserMessage("start");
+};
+
+// auto start
+setTimeout(() => {
+  window.onUserMessage("start");
+}, 500);
 </script>
-
-startChat();
-// LANGUAGE SWITCH
-document.querySelectorAll("[data-lang]").forEach(btn => {
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    lang = btn.dataset.lang;
-    chatBody.innerHTML = "";
-      
-step = 0;
-data = {};
-score = 0;
-setTimeout(startChat, 800);
-  });
-});
-
-function addMessage(text, sender) {
-  const div = document.createElement("div");
-  div.className = "message " + sender;
-  div.innerText = text;
-  chatBody.appendChild(div);
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
-
-function addButtons(options) {
-  const container = document.createElement("div");
-  container.className = "buttons";
-
-  options.forEach(opt => {
-    const btn = document.createElement("button");
-    btn.innerText = opt.label;
-    btn.onclick = () => handleAnswer(opt.value);
-    container.appendChild(btn);
-  });
-
-  chatBody.appendChild(container);
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
-const keys = [
-  "business_type",
-  "offer_type",
-  "has_leads",
-  "revenue",
-  "pain_point",
-  "urgency",
-  "name",
-  "phone",
-  "email"
-];
-    const allowedValues = [
-  "low","mid","high",
-  "yes","no",
-  "taxi","ecommerce","service","other",
-  "website","automation","system"
-];
-function handleAnswer(value) {
-const input = document.getElementById("input");
-     input.disabled = true;
- 
-   
-    
-  if (value === "book") {
-    Calendly.initPopupWidget({
-      url: "https://calendly.com/ryzenoutsourcing/30min"
-    });
-    return;
-  }
-
-  if (value === "whatsapp") {
-    const message = `Hi, I'm ${data.name}. I want to start a project.`;
-    window.open("https://wa.me/32494624429?text=" + encodeURIComponent(message));
-    return;
-  }
-
-  addMessage(value, "user");
-
-    if (step <= 3 && typeof value === "string" && !allowedValues.includes(value)) { try {
-  addMessage("⚠️ Please use the buttons.", "bot");
-        } finally {
-  enableInput();
-  return;
-}
-    window.chatLog = window.chatLog || [];
-window.chatLog.push({ step, value });
-  data[keys[step]] = value;
-
-    if (step === 1 && value === "automation") score += 2;
-  if (step === 2 && value === "yes") score += 2;
-   
-// 🔥 Revenue impact message
-if (step === 3) {
-  let estimate = "";
-
-  if (value === "low") estimate = translations[lang].estimate_low;
-  if (value === "mid") estimate = translations[lang].estimate_mid;
-  if (value === "high") estimate = translations[lang].estimate_high;
-
-  addMessage(`${translations[lang].estimate_label} ${estimate}`, "bot");
-  addMessage(translations[lang].fix_message, "bot");
-}
-  step++;
-  nextStep();
-}
-function calculateEstimatedValue(revenue) {
-  if (revenue === "high") return 10000;
-  if (revenue === "mid") return 5000;
-  if (revenue === "low") return 2000;
-  return 0;
-}
-function nextStep() {
-  const input = document.getElementById("input");
-
-  switch(step) {
-    case 0:
-      addMessage(translations[lang].business, "bot");
-      addButtons(translations[lang].buttons.business);
-      break;
-
-    case 1:
-      addMessage(translations[lang].build, "bot");
-      addButtons(translations[lang].buttons.build);
-      break;
-
-    case 2:
-      addMessage(translations[lang].clients, "bot");
-      addButtons(translations[lang].buttons.yesno);
-      break;
-
-    case 3:
-      addMessage(translations[lang].revenue, "bot");
-          addMessage("📈 Last client: +27% revenue in 30 days.", "bot");
-      addButtons(translations[lang].buttons.revenue);
-      break;
-
-    case 4:
-      addMessage(translations[lang].problem, "bot");
-      input.placeholder = "Describe your biggest problem...";
-      enableInput();
-      break;
-
-    case 5:
-      addMessage(translations[lang].urgency, "bot");
-      addButtons(translations[lang].buttons.yesno);
-      break;
-
-    case 6:
-      addMessage(translations[lang].name, "bot");
-      input.placeholder = "Your name...";
-      enableInput();
-      break;
-
-    case 7:
-      addMessage(translations[lang].phone, "bot");
-      input.placeholder = "Your phone number...";
-      enableInput();
-      break;
-          case 8:
-  addMessage("Your email?", "bot");
-  input.placeholder = "your@email.com";
-  enableInput();
-  break;
-
-    default:
-          
-  addMessage("⚠️ We only accept 3 clients per month.", "bot");
-addMessage("Next available slot: this week.", "bot");
-  finish();
-  }
-}
-
-function enableInput() {
-  const input = document.getElementById("input");
-
-  input.disabled = false;
-  input.focus();
-  
-}
-
-function sendMessage() {
-  const input = document.getElementById("input");
-  const value = input.value.trim();
-  if (!value) return;
-  input.value = "";
-  input.disabled = true;
-   handleAnswer(value);
-}
-
-function finish() {
-  // ✅ VALIDATION FIRST (before anything else)
-  if (!data.name || data.name.length < 2) {
-    console.warn("Invalid name");
-    return;
-  }
-
-  if (!data.phone || data.phone.length < 6) {
-    console.warn("Invalid phone");
-    return;
-  }
-
-  if (!data.business_type || !data.offer_type) {
-    console.warn("Invalid lead");
-    return;
-  }
-
-  // UI
-  addMessage(translations[lang].processing, "bot");setTimeout(() => {
-  sendToSupabase();
-}, 800);
-
-  if (score >= 4) {
-    setTimeout(() => {
-      addMessage(translations[lang].qualify, "bot");
-      addButtons([
-  {label: translations[lang].cta.book, value:"book"},
-  {label: translations[lang].cta.whatsapp, value:"whatsapp"}
-]);
-    }, 500);
-  } else {
-    setTimeout(() => {
-    addMessage("⚡ " + translations[lang].fallback_line1, "bot");
-addMessage(translations[lang].fallback_line2, "bot");
-    }, 500);
-  }
-}
-function sendToSupabase() {
-  const estimated_value = calculateEstimatedValue(data.revenue);
-
-  fetch('/api/lead', {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      ...data,
-      score,
-      source: "ryz3n",
-      estimated_value,
-      created_at: new Date().toISOString()
-    })
-  })
-  .then(res => res.json())
-  .then(() => console.log("Lead sent"))
-  .catch(err => console.error(err));
-}
-
-    document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-        const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-
-if (!ip) {
-  return res.status(403).json({ error: "No IP" });
-}
-document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const formData = new FormData(e.target);
-  const data = Object.fromEntries(formData);
-
-  if (!data.name || data.name.length < 2) {
-    alert("Invalid name");
-    return;
-  }
-
-  if (!data.email || data.email.length < 5) {
-    alert("Invalid email");
-    return;
-  }
-
-  const res = await fetch('/api/lead', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-
-  if (res.ok) {
-    alert("✅ Request received");
-  } else {
-    alert("❌ Error");
-  }
-});
-     
-    </script>
 </body>
 </html>
