@@ -1303,12 +1303,18 @@
         // ==========================================
         // FORM SUBMIT
         // ==========================================
-        const contactForm = document.getElementById('contactForm');
-        if (contactForm) {
-            contactForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                               contactForm.reset();
-            });
+      fetch('/api/lead', {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    name: form.name.value,
+    email: form.email.value,
+    message: form.message.value,
+    source: "website_form"
+  })
+});
         }
        
 
@@ -1594,7 +1600,8 @@ const keys = [
 function handleAnswer(value) {
 const input = document.getElementById("input");
      input.disabled = true;
-    enableInput();
+ 
+   
     
   if (value === "book") {
     Calendly.initPopupWidget({
@@ -1692,7 +1699,8 @@ function nextStep() {
       break;
 
     default:
-  addMessage("⚠️ We only accept 3 clients per month. Priority goes to qualified businesses.", "bot");
+  addMessage("⚠️ We only accept 3 clients per month.", "bot");
+addMessage("Next available slot: this week.", "bot");
   finish();
   }
 }
@@ -1702,6 +1710,7 @@ function enableInput() {
 
   input.disabled = false;
   input.focus();
+     enableInput();
 }
 
 function sendMessage() {
@@ -1710,7 +1719,6 @@ function sendMessage() {
   if (!value) return;
   input.value = "";
   input.disabled = true;
-    enableInput();
    handleAnswer(value);
 }
 
