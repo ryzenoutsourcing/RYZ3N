@@ -1339,7 +1339,7 @@ form.addEventListener("submit", async (e) => {
 
   form.reset();
 });
-        }
+        
        
 
         
@@ -1722,6 +1722,11 @@ function nextStep() {
       input.placeholder = "Your phone number...";
       enableInput();
       break;
+          case 8:
+  addMessage("Your email?", "bot");
+  input.placeholder = "your@email.com";
+  enableInput();
+  break;
 
     default:
           
