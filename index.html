@@ -1303,17 +1303,25 @@
         // ==========================================
         // FORM SUBMIT
         // ==========================================
-      fetch('/api/lead', {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    name: form.name.value,
-    email: form.email.value,
-    message: form.message.value,
-    source: "website_form"
-  })
+     const form = document.getElementById("contactForm");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  await fetch('/api/lead', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: form.name.value,
+      email: form.email.value,
+      message: form.message.value,
+      source: "website_form"
+    })
+  });
+
+  form.reset();
 });
         }
        
@@ -1672,6 +1680,7 @@ function nextStep() {
 
     case 3:
       addMessage(translations[lang].revenue, "bot");
+          addMessage("📈 Last client: +27% revenue in 30 days.", "bot");
       addButtons(translations[lang].buttons.revenue);
       break;
 
@@ -1699,6 +1708,7 @@ function nextStep() {
       break;
 
     default:
+          
   addMessage("⚠️ We only accept 3 clients per month.", "bot");
 addMessage("Next available slot: this week.", "bot");
   finish();
@@ -1710,7 +1720,7 @@ function enableInput() {
 
   input.disabled = false;
   input.focus();
-     enableInput();
+  
 }
 
 function sendMessage() {
