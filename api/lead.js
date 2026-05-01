@@ -8,7 +8,11 @@ export default async function handler(req, res) {
   }
 
   const lead = req.body;
-
+const priority =
+  lead.revenue === "high" && lead.urgency === "yes"
+    ? "HOT"
+    : "NORMAL";
+  
   // ✅ VALIDATION
    if (!lead.email || !lead.email.includes("@")) {
   return res.status(400).json({ error: "Invalid email" });
@@ -42,7 +46,7 @@ export default async function handler(req, res) {
     await resend.emails.send({
       from: "Ryz3n <onboarding@resend.dev>",
       to: ["ryzenoutsourcing@gmail.com"],
-      subject: `🔥 New Qualified Lead (${lead.revenue || "unknown"})`,
+      subject: `🔥 ${priority} Lead (€${lead.estimated_value})`
       html: `
 <h2>⚡ New Lead - Ryz3n</h2>
 
