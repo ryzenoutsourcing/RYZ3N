@@ -1138,6 +1138,13 @@
     
 </div>
 </div>
+     <form id="contactForm">
+  <input type="text" name="name" placeholder="Naam" required>
+  <input type="email" name="email" placeholder="Email" required>
+  <textarea name="message" placeholder="Bericht" required></textarea>
+  <button type="submit">Verstuur</button>
+</form>
+
 
 <script>
     (function() {
@@ -1296,14 +1303,15 @@
         // ==========================================
         // FORM SUBMIT
         // ==========================================
-        const contactForm = document.querySelector('.contact-form');
+        const contactForm = document.getElementById('contactForm');
         if (contactForm) {
             contactForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                alert('✅ Pilot request received. An architect will contact you within 24 hours.');
-                contactForm.reset();
+                               contactForm.reset();
             });
         }
+       
+
         
         // ==========================================
         // SMOOTH SCROLL VOOR SIDEBAR LINKS
@@ -1586,6 +1594,7 @@ const keys = [
 function handleAnswer(value) {
 const input = document.getElementById("input");
      input.disabled = true;
+    enableInput();
     
   if (value === "book") {
     Calendly.initPopupWidget({
@@ -1602,7 +1611,7 @@ const input = document.getElementById("input");
 
   addMessage(value, "user");
 
-    if (step <= 3 && !allowedValues.includes(value)) try {
+    if (step <= 3 && typeof value === "string" && !allowedValues.includes(value)) { try {
   addMessage("⚠️ Please use the buttons.", "bot");
         } finally {
   enableInput();
@@ -1695,6 +1704,7 @@ function sendMessage() {
   if (!value) return;
   input.value = "";
   input.disabled = true;
+    enableInput();
    handleAnswer(value);
 }
 
@@ -1736,23 +1746,10 @@ addMessage(translations[lang].fallback_line2, "bot");
   }
 }
 function sendToSupabase() {
-
-  if (data.botcheck && data.botcheck !== "") {
-    console.warn("Bot blocked");
-    return;
-  }
-
-  if (!data.phone || data.phone.length < 6) {
-    console.warn("Invalid lead blocked");
-    return;
-  }
-
-  fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+  fetch('/api/lead', {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
-      "apikey": SUPABASE_KEY,
-      "Authorization": "Bearer " + SUPABASE_KEY
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       ...data,
@@ -1760,15 +1757,32 @@ function sendToSupabase() {
       source: "ryz3n"
     })
   })
-.then(res => {
-  if (!res.ok) throw new Error("Failed to save lead");
-  console.log("Lead saved");
-})
-.catch(err => {
-  console.error("Supabase error:", err);
-});
+  .then(res => res.json())
+  .then(() => console.log("Lead sent"))
+  .catch(err => console.error(err));
 }
 
+    document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+
+  const res = await fetch('/api/lead', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+addMessage("⚡ Sending...", "bot");
+
+if (res.ok) {
+  addMessage("✅ Request received. We’ll contact you within 24h.", "bot");
+} else {
+  addMessage("❌ Error. Try again.", "bot");
+}
+});
+     
     </script>
 </body>
 </html>
