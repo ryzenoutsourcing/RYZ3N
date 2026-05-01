@@ -9,9 +9,18 @@ export default async function handler(req, res) {
 
   const lead = req.body;
 
+  // ✅ VALIDATION
+  if (!lead.name || lead.name.length < 2) {
+    return res.status(400).json({ error: "Invalid name" });
+  }
+
+  if (!lead.phone || lead.phone.length < 6) {
+    return res.status(400).json({ error: "Invalid phone" });
+  }
+
   try {
-    // 1. Save to Supabase
-    await fetch(process.env.SUPABASE_URL + "/rest/v1/leads", {
+    // ✅ SAVE TO SUPABASE
+    const response = await fetch(process.env.SUPABASE_URL + "/rest/v1/leads", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -21,12 +30,17 @@ export default async function handler(req, res) {
       body: JSON.stringify(lead)
     });
 
-    // 2. Send email
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error("Supabase error: " + text);
+    }
+
+    // ✅ EMAIL
     await resend.emails.send({
       from: "Ryz3n <onboarding@resend.dev>",
       to: ["ryzenoutsourcing@gmail.com"],
       subject: `🔥 New Qualified Lead (${lead.revenue || "unknown"})`,
-    html: `
+      html: `
 <h2>⚡ New Lead - Ryz3n</h2>
 
 <p><strong>Name:</strong> ${lead.name}</p>
@@ -39,6 +53,7 @@ export default async function handler(req, res) {
 <hr>
 
 <p><strong>Score:</strong> ${lead.score}</p>
+<p><strong>Estimated Value:</strong> €${lead.estimated_value}</p>
 <p><strong>Source:</strong> ${lead.source}</p>
 `
     });
@@ -48,13 +63,4 @@ export default async function handler(req, res) {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-
-
-if (!response.ok) {
-  const text = await response.text();
-  throw new Error("Supabase error: " + text);
-}
-  if (!lead.name || !lead.phone) {
-  return res.status(400).json({ error: "Invalid lead" });
-}
 }
