@@ -1638,7 +1638,12 @@ if (step === 3) {
   step++;
   nextStep();
 }
-
+function calculateEstimatedValue(revenue) {
+  if (revenue === "high") return 10000;
+  if (revenue === "mid") return 5000;
+  if (revenue === "low") return 2000;
+  return 0;
+}
 function nextStep() {
   const input = document.getElementById("input");
 
@@ -1746,6 +1751,8 @@ addMessage(translations[lang].fallback_line2, "bot");
   }
 }
 function sendToSupabase() {
+  const estimated_value = calculateEstimatedValue(data.revenue);
+
   fetch('/api/lead', {
     method: "POST",
     headers: {
@@ -1754,7 +1761,9 @@ function sendToSupabase() {
     body: JSON.stringify({
       ...data,
       score,
-      source: "ryz3n"
+      source: "ryz3n",
+      estimated_value,
+      created_at: new Date().toISOString()
     })
   })
   .then(res => res.json())
@@ -1764,9 +1773,34 @@ function sendToSupabase() {
 
     document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
+if (
+  !lead.name ||
+  lead.name.length < 2 ||
+  !lead.phone ||
+  lead.phone.length < 6
+) {
+  return res.status(400).json({ error: "Invalid lead data" });
+}
+        const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
+if (!ip) {
+  return res.status(403).json({ error: "No IP" });
+}
+document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
   const formData = new FormData(e.target);
   const data = Object.fromEntries(formData);
+
+  if (!data.name || data.name.length < 2) {
+    alert("Invalid name");
+    return;
+  }
+
+  if (!data.email || data.email.length < 5) {
+    alert("Invalid email");
+    return;
+  }
 
   const res = await fetch('/api/lead', {
     method: 'POST',
@@ -1774,13 +1808,11 @@ function sendToSupabase() {
     body: JSON.stringify(data),
   });
 
-addMessage("⚡ Sending...", "bot");
-
-if (res.ok) {
-  addMessage("✅ Request received. We’ll contact you within 24h.", "bot");
-} else {
-  addMessage("❌ Error. Try again.", "bot");
-}
+  if (res.ok) {
+    alert("✅ Request received");
+  } else {
+    alert("❌ Error");
+  }
 });
      
     </script>
