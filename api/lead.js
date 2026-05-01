@@ -10,6 +10,9 @@ export default async function handler(req, res) {
   const lead = req.body;
 
   // ✅ VALIDATION
+   if (!lead.email || !lead.email.includes("@")) {
+  return res.status(400).json({ error: "Invalid email" });
+     
   if (!lead.name || lead.name.length < 2) {
     return res.status(400).json({ error: "Invalid name" });
   }
@@ -57,8 +60,7 @@ export default async function handler(req, res) {
 <p><strong>Source:</strong> ${lead.source}</p>
 `
     });
-  if (!lead.email || !lead.email.includes("@")) {
-  return res.status(400).json({ error: "Invalid email" });
+ 
 }
 
 await resend.emails.send({
