@@ -57,6 +57,11 @@ export default async function handler(req, res) {
 <p><strong>Source:</strong> ${lead.source}</p>
 `
     });
+    await resend.emails.send({
+  to: [lead.email],
+  subject: "We received your request",
+  html: "We’ll contact you within 24h."
+});
 
     return res.status(200).json({ success: true });
 
