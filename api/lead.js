@@ -37,4 +37,18 @@ export default async function handler(req, res) {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
+  const response = await fetch(process.env.SUPABASE_URL + "/rest/v1/leads", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "apikey": process.env.SUPABASE_SERVICE_ROLE,
+    "Authorization": "Bearer " + process.env.SUPABASE_SERVICE_ROLE
+  },
+  body: JSON.stringify(lead)
+});
+
+if (!response.ok) {
+  const text = await response.text();
+  throw new Error("Supabase error: " + text);
+}
 }
