@@ -980,7 +980,11 @@
             <a href="#" class="cta-button cta-button-secondary" id="openModalBtn">⟫ SOVEREIGNTY PROTOCOLS</a>
         </div>
     </div>
-    
+    <div class="buttons">
+  <button onclick="quickReply('taxi')">Taxi</button>
+  <button onclick="quickReply('ecommerce')">E-commerce</button>
+  <button onclick="quickReply('agency')">Agency</button>
+</div>
     <div class="bento-grid" id="doctrine">
         <div class="block-a">
             <div class="block-id">MDL-01</div>
@@ -1150,7 +1154,9 @@
     (function() {
         // Lucide Icons
         lucide.createIcons();
-        
+        function quickReply(text) {
+  onUserMessage(text);
+}
         // ==========================================
         // STICKY SIDEBAR + HAMBURGER MENU
         // ==========================================
@@ -1565,6 +1571,24 @@ fix_message: "⚡ We kunnen dit binnen 14 dagen oplossen met een systeem op maat
 function startChat() {
   addMessage(translations[lang].welcome, "bot");
   nextStep();
+}
+    import { handleChat } from "./chat.js";
+
+function onUserMessage(message) {
+  handleChat(
+    message,
+    (reply) => addMessageToUI("bot", reply),
+    (lead) => sendLeadToAPI(lead)
+  );
+}
+    async function sendLeadToAPI(lead) {
+  await fetch("/api/lead", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(lead)
+  });
 }
 
 startChat();
