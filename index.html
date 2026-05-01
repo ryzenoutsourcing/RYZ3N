@@ -1303,7 +1303,7 @@
         // ==========================================
         // FORM SUBMIT
         // ==========================================
-     const form = document.getElementById("contactForm");
+    const form = document.getElementById("contactForm");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -1326,17 +1326,16 @@ form.addEventListener("submit", async (e) => {
 
     if (!res.ok) throw new Error();
 
-    alert("✅ Request sent. We contact you within 24h.");
+    alert("✅ Request sent.");
     form.reset();
 
   } catch {
-    alert("❌ Error. Try again.");
+    alert("❌ Error.");
   }
 
   btn.innerText = "Verstuur";
   btn.disabled = false;
 });
-
   form.reset();
 });
         
