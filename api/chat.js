@@ -173,6 +173,8 @@ export function handleChat(message, addMessage, sendLead) {
 // ================================
 // 🔁 FLOW
 // ================================
+window.addButtons(...)
+window.enableInput(...)
 function nextStep(addMessage, sendLead) {
 
   const t = translations[lang];
