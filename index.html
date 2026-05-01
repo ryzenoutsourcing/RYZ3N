@@ -1572,17 +1572,12 @@ function startChat() {
   addMessage(translations[lang].welcome, "bot");
   nextStep();
 }
-    import { handleChat } from "./chat.js";
+     
+<script type="module">
+import { handleChat } from "./chat.js";
 
-function onUserMessage(message) {
-  handleChat(
-    message,
-    (reply) => addMessageToUI("bot", reply),
-    (lead) => sendLeadToAPI(lead)
-  );
-}
-    async function sendLeadToAPI(lead) {
-  await fetch("/api/lead", {
+function sendLeadToAPI(lead) {
+  return fetch("/api/lead", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -1590,6 +1585,15 @@ function onUserMessage(message) {
     body: JSON.stringify(lead)
   });
 }
+
+window.onUserMessage = function(message) {
+  handleChat(
+    message,
+    (reply) => addMessage(reply, "bot"),
+    (lead) => sendLeadToAPI(lead)
+  );
+};
+</script>
 
 startChat();
 // LANGUAGE SWITCH
