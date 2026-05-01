@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   // ✅ VALIDATION
    if (!lead.email || !lead.email.includes("@")) {
   return res.status(400).json({ error: "Invalid email" });
-     
+     }
   if (!lead.name || lead.name.length < 2) {
     return res.status(400).json({ error: "Invalid name" });
   }
