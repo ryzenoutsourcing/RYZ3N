@@ -1308,18 +1308,34 @@
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  await fetch('/api/lead', {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      name: form.name.value,
-      email: form.email.value,
-      message: form.message.value,
-      source: "website_form"
-    })
-  });
+  const btn = form.querySelector("button");
+  btn.innerText = "Sending...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/lead', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.name.value,
+        email: form.email.value,
+        message: form.message.value,
+        source: "website_form"
+      })
+    });
+
+    if (!res.ok) throw new Error();
+
+    alert("✅ Request sent. We contact you within 24h.");
+    form.reset();
+
+  } catch {
+    alert("❌ Error. Try again.");
+  }
+
+  btn.innerText = "Verstuur";
+  btn.disabled = false;
+});
 
   form.reset();
 });
@@ -1389,7 +1405,7 @@ form.addEventListener("submit", async (e) => {
 </div>
 <script>
 const SUPABASE_URL = "https://tslbrdumaipemwyzulxk.supabase.co";
-const SUPABASE_KEY = "sb_publishable_uorf6nldVrjORpYXRGgfzA_K6_GIIs8";
+
     
 let step = 0;
 let data = {};
