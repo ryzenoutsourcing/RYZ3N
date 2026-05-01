@@ -59,6 +59,9 @@ export default async function handler(req, res) {
     });
     await resend.emails.send({
   to: [lead.email],
+      if (!lead.email || !lead.email.includes("@")) {
+  return res.status(400).json({ error: "Invalid email" });
+}
   subject: "We received your request",
   html: "We’ll contact you within 24h."
 });
