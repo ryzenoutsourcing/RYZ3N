@@ -25,11 +25,22 @@ export default async function handler(req, res) {
     await resend.emails.send({
       from: "Ryz3n <onboarding@resend.dev>",
       to: ["ryzenoutsourcing@gmail.com"],
-      subject: "🔥 New Qualified Lead",
-      html: `
-        <h2>New Lead</h2>
-        <pre>${JSON.stringify(lead, null, 2)}</pre>
-      `
+      subject: `🔥 New Qualified Lead (${lead.revenue || "unknown"})`,
+    html: `
+<h2>⚡ New Lead - Ryz3n</h2>
+
+<p><strong>Name:</strong> ${lead.name}</p>
+<p><strong>Phone:</strong> ${lead.phone}</p>
+<p><strong>Business:</strong> ${lead.business_type}</p>
+<p><strong>Offer:</strong> ${lead.offer_type}</p>
+<p><strong>Revenue:</strong> ${lead.revenue}</p>
+<p><strong>Urgency:</strong> ${lead.urgency}</p>
+
+<hr>
+
+<p><strong>Score:</strong> ${lead.score}</p>
+<p><strong>Source:</strong> ${lead.source}</p>
+`
     });
 
     return res.status(200).json({ success: true });
