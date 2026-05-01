@@ -57,11 +57,12 @@ export default async function handler(req, res) {
 <p><strong>Source:</strong> ${lead.source}</p>
 `
     });
-    await resend.emails.send({
-  to: [lead.email],
-      if (!lead.email || !lead.email.includes("@")) {
+  if (!lead.email || !lead.email.includes("@")) {
   return res.status(400).json({ error: "Invalid email" });
 }
+
+await resend.emails.send({
+  to: [lead.email],
   subject: "We received your request",
   html: "We’ll contact you within 24h."
 });
