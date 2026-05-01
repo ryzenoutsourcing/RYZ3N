@@ -34,22 +34,22 @@ export function handleChat(message, sendReply, sendLead) {
     return;
   }
 
-  if (step === 1) {
-    lead.business_type = msg;
-  }
+if (step === 1) {
+  lead.business_type = msg;
+}
 
-  if (step === 2) {
-    lead.revenue = msg.toLowerCase();
-  }
+if (step === 2) {
+  lead.offer_type = "system"; // 🔥 ADD THIS
+  lead.revenue = msg.toLowerCase();
+}
 
-  if (step === 3) {
-    lead.bottleneck = msg;
-  }
+if (step === 3) {
+  lead.bottleneck = msg;
+}
 
-  if (step === 4) {
-    lead.urgency = msg.toLowerCase();
-  }
-
+if (step === 4) {
+  lead.urgency = msg.toLowerCase();
+}
   if (step === 5) {
     lead.name = msg;
   }
@@ -64,10 +64,12 @@ export function handleChat(message, sendReply, sendLead) {
     // 🔥 SCORING
     let score = 0;
 
-    if (lead.revenue === "high") score += 50;
-    if (lead.revenue === "medium") score += 30;
+if (lead.revenue === "high") score += 50;
+if (lead.revenue === "medium") score += 30;
 
-    if (lead.urgency === "yes") score += 30;
+if (lead.urgency === "yes") score += 30;
+
+if (lead.business_type === "taxi") score += 20;
 
     lead.score = score;
     lead.estimated_value = score * 100;
